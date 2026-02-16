@@ -1,0 +1,172 @@
+/* Estilos simples y claros para el juego Whack-a-Mole */
+
+:root{
+  --bg-top: #8fd3f4; /* cielo */
+  --bg-bottom: #a7f3a5; /* campo */
+  --panel: #fffaf0;
+  --accent: #ffce54;
+  --accent-2: #ff6b6b;
+  --grass: #69b34c;
+  --hole: #2b2b2b;
+  --mole: #7b3f2f;
+  --mole-cheek: #ff8fa3;
+  --text-dark: #1f2937;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family: 'Nunito', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
+}
+
+.game{
+  width:820px;
+  max-width:95%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.85));
+  padding:18px;
+  border-radius:14px;
+  box-shadow:0 18px 40px rgba(2,6,23,0.18);
+  border: 1px solid rgba(255,255,255,0.6);
+}
+
+/* Top bar / panel */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--panel);border-radius:10px;box-shadow:inset 0 -6px 12px rgba(0,0,0,0.04);margin-bottom:14px}
+.topbar .brand h1{margin:0;font-size:20px;color:var(--text-dark);text-shadow:0 2px 0 rgba(255,255,255,0.4)}
+.panel{display:flex;gap:12px;align-items:center}
+.panel-item{display:flex;flex-direction:column;align-items:center;padding:6px 10px}
+.panel-item .label{font-size:12px;color:var(--text-dark);opacity:0.8}
+.panel-item .value{font-weight:800;font-size:18px;color:var(--text-dark)}
+.select-difficulty{padding:6px 8px;border-radius:8px;border:1px solid rgba(0,0,0,0.08);background:#fff}
+.btn-start{background: linear-gradient(180deg,var(--accent),var(--accent-2));border:0;color:#fff;padding:10px 16px;border-radius:12px;font-weight:800;box-shadow:0 8px 18px rgba(255,110,110,0.18);cursor:pointer;transition:transform .12s ease, box-shadow .12s ease}
+.btn-start:hover{transform:translateY(-3px);box-shadow:0 14px 26px rgba(255,110,110,0.18)}
+
+.difficulty{display:flex;align-items:center;gap:6px;margin-left:8px}
+.difficulty label{font-weight:600;font-size:13px}
+.difficulty select{padding:6px 8px;border-radius:6px;border:1px solid rgba(0,0,0,0.08);background:#fff}
+/* estilo cuando está bloqueado durante la partida */
+.difficulty select:disabled{opacity:0.6;cursor:not-allowed}
+
+/* Board looks like grass field */
+.board{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:16px;
+  margin:8px 0 0 0;
+  padding:18px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02));
+  border-radius:12px;
+  box-shadow: 0 12px 30px rgba(12,36,12,0.08);
+  background-image: radial-gradient(circle at 20% 10%, rgba(255,255,255,0.03) 0, transparent 30%),
+                    radial-gradient(circle at 80% 80%, rgba(255,255,255,0.02) 0, transparent 30%);
+  background-blend-mode: overlay;
+}
+
+/* Cada 'hole' es clickeable; la topo (mole) se mueve desde abajo */
+.hole{
+  position:relative;
+  background: linear-gradient(180deg, #3fa34a 0%, #2e8b3a 100%);
+  height:130px;
+  border-radius:16px;
+  overflow:visible;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32'><text x='0' y='22' font-size='20'>🔨</text></svg>") 16 16, pointer;
+  user-select:none;
+  box-shadow: inset 0 -18px 30px rgba(0,0,0,0.35), 0 8px 18px rgba(0,0,0,0.08);
+}
+
+/* rim / hole opening */
+.hole::after{
+  content:'';
+  position:absolute;
+  left:50%;
+  bottom:6px;
+  transform:translateX(-50%);
+  width:78%;
+  height:48px;
+  border-radius:40px 40px 18px 18px;
+  background: radial-gradient(ellipse at center, rgba(0,0,0,0.6), rgba(0,0,0,0.85));
+  box-shadow: inset 0 8px 20px rgba(0,0,0,0.6);
+  z-index:1;
+}
+
+/* Topo: forma sencilla */
+.mole{
+  width:72px;
+  height:72px;
+  background: linear-gradient(180deg,#8b5d4d,#6b3f2f);
+  border-radius:50%;
+  transform: translateY(60px) scale(.8);
+  opacity:0;
+  transition: transform 260ms cubic-bezier(.2,.9,.3,1), opacity 200ms ease;
+  position:relative;
+  z-index:2;
+  display:flex;align-items:center;justify-content:center;
+}
+
+/* cartoon face using pseudo-elements */
+.mole::before{
+  content:'';
+  position:absolute;
+  width:60%;
+  height:46%;
+  bottom:18%;
+  left:50%;
+  transform:translateX(-50%);
+  border-radius:22px 22px 18px 18px;
+  background: linear-gradient(180deg,#ffd9c9,#ffbfb0);
+}
+.mole::after{
+  content:'';
+  position:absolute;
+  width:8px;height:8px;border-radius:50%;left:36%;top:34%;background:#2b2b2b;box-shadow:12px 0 0 #2b2b2b;
+}
+
+/* Estado visible del topo */
+.hole.up .mole{
+  transform: translateY(0) scale(1);
+  opacity:1;
+  animation: popIn .26s ease;
+}
+
+@keyframes popIn{
+  0%{transform:translateY(60px) scale(.8);opacity:0}
+  70%{transform:translateY(-6px) scale(1.06);opacity:1}
+  100%{transform:translateY(0) scale(1)}
+}
+
+/* Pequeña animación al hacer click (feedback) */
+.mole.hit{animation: hitAnim .36s ease both}
+
+@keyframes hitAnim{
+  0%{transform:translateY(0) rotate(0)}
+  30%{transform:translateY(2px) rotate(-12deg) scale(.96)}
+  70%{transform:translateY(-2px) rotate(8deg) scale(.98)}
+  100%{transform:translateY(0) rotate(0) scale(.98)}
+}
+
+/* Controles y mensajes */
+.controls{display:flex;justify-content:center;margin-top:8px}
+.message{margin-top:14px;text-align:center;font-weight:800;color:var(--text-dark);font-size:16px}
+
+/* boom effect */
+.boom{
+  position:absolute;left:50%;top:18%;transform:translateX(-50%);z-index:3;font-weight:800;color:#fff;padding:6px 8px;border-radius:8px;background:linear-gradient(90deg,#ffde59,#ff7a7a);animation: boomAnim .5s ease forwards;pointer-events:none;font-size:13px}
+
+@keyframes boomAnim{
+  0%{opacity:0;transform:translateX(-50%) scale(.6)}
+  40%{opacity:1;transform:translateX(-50%) scale(1.08)}
+  100%{opacity:0;transform:translateX(-50%) translateY(-20px) scale(.8)}
+}
+
+/* Responsivo */
+@media (max-width:420px){
+  .game{padding:12px}
+  .hole{height:72px}
+}
